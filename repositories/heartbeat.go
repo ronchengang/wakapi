@@ -267,21 +267,41 @@ func (r *HeartbeatRepository) GetUserProjectStats(user *models.User, from, to ti
 	}
 
 	if err := r.db.
-		Raw("with projects as ( "+
-			"select project as p, user_id, min(time) as first, max(time) as last, count(*) as cnt "+
-			"from heartbeats "+
-			"where user_id = ? and project != '' "+
-			"and time between ? and ? "+
-			"and language is not null and language != '' and project != '' "+
-			"group by project, user_id "+
-			"order by last desc "+
-			limitOffsetClause+
-			") "+
-			"select distinct project, min(first) as first, min(last) as last, min(cnt) as count, first_value(language) over (partition by project order by count(*) desc) as top_language "+
-			"from heartbeats "+
-			"inner join projects on heartbeats.project = projects.p and heartbeats.user_id = projects.user_id "+
-			"group by project, language "+
-			"order by last desc", args...).
+		Raw(`SELECT DISTINCT 
+			    h2.project,
+			    MIN(p.first) as first,
+			    MIN(p.last) as last,
+			    MIN(p.cnt) as count,
+			    (
+				SELECT h3.language
+				FROM heartbeats h3
+				WHERE h3.project = h2.project 
+				AND h3.user_id = h2.user_id
+				GROUP BY h3.language
+				ORDER BY COUNT(*) DESC
+				LIMIT 1
+			    ) as top_language
+			FROM (
+			    SELECT 
+				project as p,
+				user_id,
+				MIN(time) as first,
+				MAX(time) as last,
+				COUNT(*) as cnt
+			    FROM heartbeats
+			    WHERE user_id = ? 
+				AND project != ''
+				AND time BETWEEN ? AND ?
+				AND language IS NOT NULL
+				AND language != ''
+				AND project != ''
+			    GROUP BY project, user_id
+			    ORDER BY last DESC
+			    `+limitOffsetClause+`
+			) p
+			INNER JOIN heartbeats h2 ON h2.project = p.p AND h2.user_id = p.user_id
+			GROUP BY h2.project, h2.language
+			ORDER BY last DESC`, args...).
 		Scan(&projectStats).Error; err != nil {
 		return nil, err
 	}
