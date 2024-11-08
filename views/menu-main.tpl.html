@@ -29,41 +29,6 @@
         </a>
     </div>
 
-    <div class="menu-item relative" @click="state.showDropdownResources = !state.showDropdownResources" data-trigger-for="showDropdownResources">
-        <span class="iconify inline text-2xl text-gray-400" data-icon="ph:books-bold"></span>
-        <a class="text-gray-400 hidden lg:inline-block">Resources</a>
-        <span class="iconify inline text-xl text-gray-400" data-icon="akar-icons:chevron-down"></span>
-
-        <div v-cloak v-show="state.showDropdownResources" class="flex bg-gray-850 shadow-md z-10 p-2 absolute top-0 right-0 rounded popup mt-12 w-full" id="resources-menu-dropdown" style="min-width: 128px">
-            <div class="grow flex flex-col">
-                <div class="submenu-item">
-                    <a class="flex justify-between w-full text-gray-300 items-center px-2 font-semibold" href="https://github.com/muety/wakapi" target="_blank" rel="noreferrer noopener" @click="state.showDropdownResources = !state.showDropdownResources"  data-trigger-for="showDropdownResources">
-                        <span class="text-sm">GitHub</span>
-                        <span class="iconify inline" data-icon="codicon:github-inverted"></span>
-                    </a>
-                </div>
-                <div class="submenu-item">
-                    <a class="flex justify-between w-full text-gray-300 items-center px-2 font-semibold" href="swagger-ui" @click="state.showDropdownResources = !state.showDropdownResources"  data-trigger-for="showDropdownResources">
-                        <span class="text-sm">API Docs</span>
-                        <span class="iconify inline" data-icon="bx:bx-code-curly"></span>
-                    </a>
-                </div>
-                <div class="submenu-item">
-                    <a class="flex justify-between w-full text-gray-300 items-center px-2 font-semibold" href="https://wakatime.com" target="_blank" rel="noreferrer noopener" @click="state.showDropdownResources = !state.showDropdownResources"  data-trigger-for="showDropdownResources">
-                        <span class="text-sm">WakaTime</span>
-                        <span class="iconify inline" data-icon="simple-icons:wakatime"></span>
-                    </a>
-                </div>
-                <div class="submenu-item">
-                    <a class="flex justify-between w-full text-gray-300 items-center px-2 font-semibold" href="https://github.com/sponsors/muety" target="_blank" rel="noreferrer noopener" @click="state.showDropdownResources = !state.showDropdownResources"  data-trigger-for="showDropdownResources">
-                        <span class="text-sm">Donate</span>
-                        <span class="iconify inline" data-icon="bx:bxs-heart"></span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <a class="menu-item" href="settings">
         <span class="iconify inline text-2xl text-gray-400" data-icon="ci:settings-filled"></span>
         <span class="text-gray-400 hidden lg:inline-block">Settings</span>
