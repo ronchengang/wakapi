@@ -13,13 +13,14 @@ import (
 
 	"github.com/duke-git/lancet/v2/slice"
 
+	"log/slog"
+
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/securecookie"
 	"github.com/jinzhu/configor"
 	"github.com/muety/wakapi/data"
 	"github.com/muety/wakapi/utils"
 	"github.com/robfig/cron/v3"
-	"log/slog"
 )
 
 const (
@@ -125,6 +126,7 @@ type securityConfig struct {
 	SecureCookie               *securecookie.SecureCookie `yaml:"-"`
 	SessionKey                 []byte                     `yaml:"-"`
 	trustReverseProxyIpsParsed []net.IPNet
+	AllowedEmailDomains        []string `yaml:"allowed_email_domains"`
 }
 
 type dbConfig struct {
