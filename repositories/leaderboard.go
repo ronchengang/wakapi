@@ -44,14 +44,16 @@ func (r *LeaderboardRepository) CountUsers(excludeZero bool) (int64, error) {
 }
 
 func (r *LeaderboardRepository) GetAllAggregatedByInterval(key *models.IntervalKey, by *uint8, limit, skip int) ([]*models.LeaderboardItemRanked, error) {
-	// TODO: distinct by (user, key) to filter out potential duplicates ?
-
 	var items []*models.LeaderboardItemRanked
+
+	rankSubquery := "(SELECT COUNT(*) + 1 FROM leaderboard_items l2 WHERE l2.`key` = leaderboard_items.`key` AND l2.total > leaderboard_items.total) as `rank`"
+
 	subq := r.db.
 		Table("leaderboard_items").
-		Select("*, rank() over (partition by \"key\" order by total desc) as \"rank\"").
-		Where("\"interval\" in ?", *key)
-	subq = utils.WhereNullable(subq, "\"by\"", by)
+		Select("leaderboard_items.*, "+rankSubquery).
+		Where("`interval` in ?", *key).
+		Order("`key`, total DESC")
+	subq = utils.WhereNullable(subq, "`by`", by)
 
 	q := r.db.Table("(?) as ranked", subq)
 	q = r.withPaging(q, limit, skip)
@@ -64,11 +66,14 @@ func (r *LeaderboardRepository) GetAllAggregatedByInterval(key *models.IntervalK
 
 func (r *LeaderboardRepository) GetAggregatedByUserAndInterval(userId string, key *models.IntervalKey, by *uint8, limit, skip int) ([]*models.LeaderboardItemRanked, error) {
 	var items []*models.LeaderboardItemRanked
+
+	rankSubquery := "(SELECT COUNT(*) + 1 FROM leaderboard_items l2 WHERE l2.`key` = leaderboard_items.`key` AND l2.total > leaderboard_items.total) as `rank`"
+
 	subq := r.db.
 		Table("leaderboard_items").
-		Select("*, rank() over (partition by \"key\" order by total desc) as \"rank\"").
-		Where("\"interval\" in ?", *key)
-	subq = utils.WhereNullable(subq, "\"by\"", by)
+		Select("leaderboard_items.*, "+rankSubquery).
+		Where("`interval` in ?", *key)
+	subq = utils.WhereNullable(subq, "`by`", by)
 
 	q := r.db.Table("(?) as ranked", subq).Where("user_id = ?", userId)
 	q = r.withPaging(q, limit, skip)
