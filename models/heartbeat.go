@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"unicode"
 
 	"log/slog"
 
@@ -31,12 +32,12 @@ type Heartbeat struct {
 	Origin           string     `json:"-" hash:"ignore" gorm:"type:varchar(255)"`
 	OriginId         string     `json:"-" hash:"ignore" gorm:"type:varchar(255)"`
 	CreatedAt        CustomTime `json:"created_at" gorm:"timeScale:3" swaggertype:"primitive,number" hash:"ignore"` // https://gorm.io/docs/conventions.html#CreatedAt
-	Lines            int        `json:"lines,omitempty" hash:"ignore"`
-	LineNo           int        `json:"lineno,omitempty" hash:"ignore"`
-	CursorPos        int        `json:"cursorpos,omitempty" hash:"ignore"`
-	LineDeletions    int        `json:"line_deletions,omitempty" hash:"ignore"`
-	LineAdditions    int        `json:"line_additions,omitempty" hash:"ignore"`
-	ProjectRootCount int        `json:"project_root_count,omitempty" hash:"ignore"`
+	Lines            *int       `json:"lines,omitempty" hash:"ignore"`
+	LineNo           *int       `json:"lineno,omitempty" hash:"ignore"`
+	CursorPos        *int       `json:"cursorpos,omitempty" hash:"ignore"`
+	LineDeletions    *int       `json:"line_deletions,omitempty" hash:"ignore"`
+	LineAdditions    *int       `json:"line_additions,omitempty" hash:"ignore"`
+	ProjectRootCount *int       `json:"project_root_count,omitempty" hash:"ignore"`
 }
 
 func (h *Heartbeat) Valid() bool {
@@ -48,9 +49,31 @@ func (h *Heartbeat) Timely(maxAge time.Duration) bool {
 	return now.Sub(h.Time.T()) <= maxAge && h.Time.T().Sub(now) < 1*time.Hour
 }
 
+func CapitalizeIfNeeded(s string) string {
+	if len(s) == 0 || unicode.IsUpper(rune(s[0])) {
+		return s
+	}
+	return strings.ToUpper(s[0:1]) + s[1:]
+}
+
 func (h *Heartbeat) Sanitize() *Heartbeat {
 	h.OperatingSystem = strutil.Capitalize(h.OperatingSystem)
-	h.Editor = strutil.Capitalize(h.Editor)
+
+	if h.UserAgent != "" {
+		parts := strings.Split(h.UserAgent, " ")
+		for i := len(parts) - 1; i >= 0; i-- {
+			if strings.Contains(parts[i], "wakatime") {
+				if i > 0 {
+					editorPart := parts[i-1]
+					if strings.Contains(editorPart, "/") {
+						h.Editor = CapitalizeIfNeeded(strings.Split(editorPart, "/")[0])
+					}
+				}
+				break
+			}
+		}
+	}
+
 	return h
 }
 
