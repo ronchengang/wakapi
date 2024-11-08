@@ -2,6 +2,9 @@ package routes
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
+
 	"github.com/duke-git/lancet/v2/slice"
 	"github.com/go-chi/chi/v5"
 	conf "github.com/muety/wakapi/config"
@@ -11,8 +14,6 @@ import (
 	routeutils "github.com/muety/wakapi/routes/utils"
 	"github.com/muety/wakapi/services"
 	"github.com/muety/wakapi/utils"
-	"net/http"
-	"strings"
 )
 
 type LeaderboardHandler struct {
@@ -39,7 +40,7 @@ func (h *LeaderboardHandler) RegisterRoutes(router chi.Router) {
 		middlewares.NewAuthenticateMiddleware(h.userService).
 			WithRedirectTarget(defaultErrorRedirectTarget()).
 			WithRedirectErrorMessage("unauthorized").
-			WithOptionalFor("/").Handler,
+			Handler,
 	)
 	r.Get("/", h.GetIndex)
 
@@ -50,6 +51,13 @@ func (h *LeaderboardHandler) GetIndex(w http.ResponseWriter, r *http.Request) {
 	if h.config.IsDev() {
 		loadTemplates()
 	}
+	user := middlewares.GetPrincipal(r)
+	if user == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		templates[conf.SummaryTemplate].Execute(w, h.buildViewModel(r, w).WithError("unauthorized"))
+		return
+	}
+
 	if err := templates[conf.LeaderboardTemplate].Execute(w, h.buildViewModel(r, w)); err != nil {
 		conf.Log().Request(r).Error("failed to get leaderboard page", "error", err)
 	}
