@@ -207,6 +207,13 @@ func (h *LoginHandler) PostSignup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// check email domain, only domain in allowed list
+	if !IsEmailDomainAllowed(signup.Email) {
+		w.WriteHeader(http.StatusBadRequest)
+		templates[conf.SignupTemplate].Execute(w, h.buildViewModel(r, w, h.config.Security.SignupCaptcha).WithError("email domain not allowed"))
+		return
+	}
+
 	numUsers, _ := h.userSrvc.Count()
 
 	_, created, err := h.userSrvc.CreateOrGet(&signup, numUsers == 0)
@@ -224,6 +231,25 @@ func (h *LoginHandler) PostSignup(w http.ResponseWriter, r *http.Request) {
 
 	routeutils.SetSuccess(r, w, "account created successfully")
 	http.Redirect(w, r, h.config.Server.BasePath, http.StatusFound)
+}
+
+func IsEmailDomainAllowed(email string) bool {
+	allowedDomains := conf.Get().Security.AllowedEmailDomains
+	
+	// If no domains are specified, allow all
+	if len(allowedDomains) == 0 {
+		return true
+	}
+
+	parts := strings.Split(email, "@")
+
+	domain := strings.ToLower(parts[1])
+	for _, allowed := range allowedDomains {
+		if strings.ToLower(allowed) == domain {
+			return true
+		}
+	}
+	return false
 }
 
 func (h *LoginHandler) GetResetPassword(w http.ResponseWriter, r *http.Request) {
