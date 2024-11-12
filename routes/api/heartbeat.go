@@ -8,12 +8,14 @@ import (
 
 	conf "github.com/muety/wakapi/config"
 	"github.com/muety/wakapi/middlewares"
-	customMiddleware "github.com/muety/wakapi/middlewares/custom"
+
+	// customMiddleware "github.com/muety/wakapi/middlewares/custom"
+	"net/http"
+
 	v1 "github.com/muety/wakapi/models/compat/wakatime/v1"
 	routeutils "github.com/muety/wakapi/routes/utils"
 	"github.com/muety/wakapi/services"
 	"github.com/muety/wakapi/utils"
-	"net/http"
 
 	"github.com/muety/wakapi/models"
 )
@@ -38,7 +40,7 @@ func (h *HeartbeatApiHandler) RegisterRoutes(router chi.Router) {
 	router.Group(func(r chi.Router) {
 		r.Use(
 			middlewares.NewAuthenticateMiddleware(h.userSrvc).WithOptionalForMethods(http.MethodOptions).Handler,
-			customMiddleware.NewWakatimeRelayMiddleware().Handler,
+			// customMiddleware.NewWakatimeRelayMiddleware().Handler,
 		)
 		// see https://github.com/muety/wakapi/issues/203
 		r.Post("/heartbeat", h.Post)
