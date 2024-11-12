@@ -2,6 +2,12 @@ package routes
 
 import (
 	"fmt"
+	"log/slog"
+	"net/http"
+	"net/url"
+	"strings"
+	"time"
+
 	"github.com/dchest/captcha"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/httprate"
@@ -12,11 +18,6 @@ import (
 	routeutils "github.com/muety/wakapi/routes/utils"
 	"github.com/muety/wakapi/services"
 	"github.com/muety/wakapi/utils"
-	"log/slog"
-	"net/http"
-	"net/url"
-	"strings"
-	"time"
 )
 
 type LoginHandler struct {
@@ -234,14 +235,22 @@ func (h *LoginHandler) PostSignup(w http.ResponseWriter, r *http.Request) {
 }
 
 func IsEmailDomainAllowed(email string) bool {
+	// Return false if email is empty
+	if email == "" {
+		return false
+	}
+
+	parts := strings.Split(email, "@")
+	if len(parts) != 2 {
+		return false
+	}
+
 	allowedDomains := conf.Get().Security.AllowedEmailDomains
-	
+
 	// If no domains are specified, allow all
 	if len(allowedDomains) == 0 {
 		return true
 	}
-
-	parts := strings.Split(email, "@")
 
 	domain := strings.ToLower(parts[1])
 	for _, allowed := range allowedDomains {
