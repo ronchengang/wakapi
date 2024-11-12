@@ -1,0 +1,1 @@
+go build -ldflags "-X github.com/muety/wakapi/utils.CommitHash=$(git rev-parse HEAD)" -o wakapi

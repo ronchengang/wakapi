@@ -1,10 +1,11 @@
 package routes
 
 import (
-	"github.com/duke-git/lancet/v2/strutil"
-	"github.com/muety/wakapi/helpers"
 	"html/template"
 	"strings"
+
+	"github.com/duke-git/lancet/v2/strutil"
+	"github.com/muety/wakapi/helpers"
 
 	"github.com/duke-git/lancet/v2/datetime"
 	"github.com/muety/wakapi/config"
@@ -46,7 +47,7 @@ func DefaultTemplateFuncs() template.FuncMap {
 			return config.Get().Server.BasePath
 		},
 		"getVersion": func() string {
-			return config.Get().Version
+			return config.Get().Version + " " + utils.GetCommitHash()
 		},
 		"getDbType": func() string {
 			return strings.ToLower(config.Get().Db.Type)
