@@ -348,7 +348,7 @@ func (h *LoginHandler) PostResetPassword(w http.ResponseWriter, r *http.Request)
 
 	if !h.config.Mail.Enabled {
 		w.WriteHeader(http.StatusNotImplemented)
-		templates[conf.ResetPasswordTemplate].Execute(w, h.buildViewModel(r, w, false).WithError("mailing is disabled on this server"))
+		templates[conf.ResetPasswordTemplate].Execute(w, h.buildViewModel(r, w, false).WithError("mailing is disabled on this server, manually send email to <delphaioperation@deloittecn.com.cn> for password resetting"))
 		return
 	}
 
