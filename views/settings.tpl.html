@@ -90,22 +90,6 @@
                     </div>
                 </div>
 
-                {{ if .User.Email }}
-                <div class="flex mb-8">
-                    <div class="w-1/2 mr-4 inline-block">
-                        <label class="font-semibold text-gray-300" for="reports_weekly">Weekly E-Mail Reports</label>
-                        <span class="block text-sm text-gray-600">Opt in to receive a summary of your coding activity once a week.</span>
-                    </div>
-                    <div class="w-1/2 ml-4">
-                        <select autocomplete="off" id="reports_weekly" name="reports_weekly"
-                                class="select-default">
-                            <option value="false" class="cursor-pointer" {{ if not .User.ReportsWeekly }} selected{{ end }}>Disabled</option>
-                            <option value="true" class="cursor-pointer" {{ if .User.ReportsWeekly }} selected {{ end }}>Enabled</option>
-                        </select>
-                    </div>
-                </div>
-                {{ end }}
-
                 <div class="flex justify-end mt-4">
                     <button type="submit" class="btn-primary">
                         Save
