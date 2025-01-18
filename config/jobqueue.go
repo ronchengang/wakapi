@@ -2,9 +2,10 @@ package config
 
 import (
 	"fmt"
+	"log/slog"
+
 	"github.com/muety/artifex/v2"
 	"github.com/muety/wakapi/utils"
-	"log/slog"
 )
 
 var jobQueues map[string]*artifex.Dispatcher
@@ -32,9 +33,9 @@ func init() {
 func StartJobs() {
 	InitQueue(QueueDefault, 1)
 	InitQueue(QueueProcessing, utils.HalfCPUs())
-	InitQueue(QueueReports, 1)
-	InitQueue(QueueMails, 1)
-	InitQueue(QueueImports, 1)
+	// InitQueue(QueueReports, 1)
+	// InitQueue(QueueMails, 1)
+	// InitQueue(QueueImports, 1)
 	InitQueue(QueueHousekeeping, utils.HalfCPUs())
 }
 
