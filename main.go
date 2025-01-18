@@ -17,7 +17,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/lpar/gzipped/v2"
-	//httpSwagger "github.com/swaggo/http-swagger"
+	httpSwagger "github.com/swaggo/http-swagger"
 	_ "gorm.io/driver/mysql"
 	_ "gorm.io/driver/postgres"
 	_ "gorm.io/driver/sqlite"
@@ -196,7 +196,7 @@ func main() {
 	// Schedule background tasks
 	go conf.StartJobs()
 	go aggregationService.Schedule()
-	//go reportService.Schedule()
+	go reportService.Schedule()
 	go housekeepingService.Schedule()
 	go miscService.Schedule()
 
@@ -311,12 +311,12 @@ func main() {
 	if !config.IsDev() {
 		assetsFileServer = gzipped.FileServer(assetsStaticFs)
 	}
-	//staticFileServer := http.FileServer(http.FS(fsutils.NeuteredFileSystem{FS: static}))
+	staticFileServer := http.FileServer(http.FS(fsutils.NeuteredFileSystem{FS: static}))
 
-	//router.Get("/contribute.json", staticFileServer.ServeHTTP)
+	router.Get("/contribute.json", staticFileServer.ServeHTTP)
 	router.Get("/assets/*", assetsFileServer.ServeHTTP)
-	//router.Get("/swagger-ui", http.RedirectHandler("swagger-ui/", http.StatusMovedPermanently).ServeHTTP) // https://github.com/swaggo/http-swagger/issues/44
-	//router.Get("/swagger-ui/*", httpSwagger.WrapHandler)
+	router.Get("/swagger-ui", http.RedirectHandler("swagger-ui/", http.StatusMovedPermanently).ServeHTTP) // https://github.com/swaggo/http-swagger/issues/44
+	router.Get("/swagger-ui/*", httpSwagger.WrapHandler)
 
 	if config.EnablePprof {
 		slog.Info("profiling enabled, exposing pprof data", "url", "http://127.0.0.1:6060/debug/pprof")
