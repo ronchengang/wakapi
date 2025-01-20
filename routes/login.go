@@ -43,13 +43,13 @@ func (h *LoginHandler) RegisterRoutes(router chi.Router) {
 		Post("/login", h.PostLogin)
 	router.Get("/signup", h.GetSignup)
 	router.
-		With(httprate.LimitByRealIP(h.config.Security.GetSignupMaxRate())).
+		//With(httprate.LimitByRealIP(h.config.Security.GetSignupMaxRate())).
 		Post("/signup", h.PostSignup)
 	router.Get("/set-password", h.GetSetPassword)
 	router.Post("/set-password", h.PostSetPassword)
 	router.Get("/reset-password", h.GetResetPassword)
 	router.
-		With(httprate.LimitByRealIP(h.config.Security.GetPasswordResetMaxRate())).
+		//With(httprate.LimitByRealIP(h.config.Security.GetPasswordResetMaxRate())).
 		Post("/reset-password", h.PostResetPassword)
 
 	authMiddleware := middlewares.NewAuthenticateMiddleware(h.userSrvc).
