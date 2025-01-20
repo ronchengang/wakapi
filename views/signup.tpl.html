@@ -33,7 +33,7 @@
 
         </div>
 
-        <form class="mt-10" action="signup" method="post">
+        <form class="mt-10" action="signup" method="post" onsubmit="disableSubmitButton()">
             <input type="hidden" name="location" id="input-location" v-model="timezone">
             <input type="hidden" name="captcha_id" value="{{ .CaptchaId }}">
             <input type="hidden" name="invite_code" id="input-invite-code" value="{{ .InviteCode }}">
@@ -96,7 +96,7 @@
                     <button type="button" class="btn-default">Log in</button>
                 </a>
                 {{ if or (.AllowSignup) (ne .InviteCode "") }}
-                <button type="submit" class="btn-primary">
+                <button type="submit" class="btn-primary" id="submit-button">
                     Create Account
                 </button>
                 {{ else }}
@@ -112,6 +112,17 @@
 {{ template "footer.tpl.html" . }}
 
 {{ template "foot.tpl.html" . }}
+
+<script>
+function disableSubmitButton() {
+    const button = document.getElementById('submit-button');
+    button.disabled = true;
+    button.classList.remove('btn-primary');
+    button.classList.add('btn-disabled');
+    button.textContent = 'Creating Account...';
+    return true;
+}
+</script>
 
 </body>
 
