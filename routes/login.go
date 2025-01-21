@@ -101,7 +101,7 @@ func (h *LoginHandler) PostLogin(w http.ResponseWriter, r *http.Request) {
 	user, err := h.userSrvc.GetUserById(login.Username)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
-		templates[conf.LoginTemplate].Execute(w, h.buildViewModel(r, w, false).WithError("resource not found"))
+		templates[conf.LoginTemplate].Execute(w, h.buildViewModel(r, w, false).WithError("user not found"))
 		return
 	}
 
