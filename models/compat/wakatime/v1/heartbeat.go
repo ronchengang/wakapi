@@ -50,6 +50,13 @@ type HeartbeatEntry struct {
 	CreatedAt     time.Time `json:"created_at"`
 }
 
+func derefInt(ptr *int) int {
+	if ptr == nil {
+		return 0
+	}
+	return *ptr
+}
+
 func HeartbeatsToCompat(entries []*models.Heartbeat) []*HeartbeatEntry {
 	out := make([]*HeartbeatEntry, len(entries))
 	for i := 0; i < len(entries); i++ {
@@ -67,11 +74,11 @@ func HeartbeatsToCompat(entries []*models.Heartbeat) []*HeartbeatEntry {
 			UserId:        entry.UserID,
 			MachineNameId: entry.Machine,
 			UserAgentId:   entry.UserAgent,
-			Lines:         entry.Lines,
-			LineNo:        entry.LineNo,
-			LineAdditions: entry.LineAdditions,
-			LineDeletions: entry.LineDeletions,
-			CursorPos:     entry.CursorPos,
+			Lines:         derefInt(entry.Lines),
+			LineNo:        derefInt(entry.LineNo),
+			LineAdditions: derefInt(entry.LineAdditions),
+			LineDeletions: derefInt(entry.LineDeletions),
+			CursorPos:     derefInt(entry.CursorPos),
 			CreatedAt:     entry.CreatedAt.T(),
 		}
 	}
